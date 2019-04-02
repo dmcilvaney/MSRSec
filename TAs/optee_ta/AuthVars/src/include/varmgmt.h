@@ -60,6 +60,8 @@ typedef struct _AUTHVAR_META
     UINT64              ObjectID;       // Storage object identifier
     TEE_ObjectHandle    ObjectHandle;   // Handle to open storage object
     PUEFI_VARIABLE      Var;            // In-memory variable
+    BOOL                Loaded;         // Has the variable been loaded from storage?
+    TEE_ObjectInfo      ObjInfo;        // Data required for loading image.
 } AUTHVAR_META, *PAUTHVAR_META;
 #endif 
 
