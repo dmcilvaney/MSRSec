@@ -6,20 +6,16 @@
 trigger:
 - master
 
-pool:
-  vmImage: 'Ubuntu-16.04'
+resources:
+  repositories:
+  - repository: optee_os
+    type: github
+    name: ms-iot/optee_os
 
 jobs:
   - job: Build
-    resources:
-      repositories:
-      - repository: optee_os
-        type: github
-        name: ms-iot/optee_os
-      - repository: imx-iotcore
-        type: github
-        name: ms-iot/imx-iotcore
-
+    pool:
+      vmImage: 'Ubuntu-16.04'
     strategy:
       matrix:
         TpmWolf:
@@ -37,9 +33,7 @@ jobs:
 
     steps:
     - checkout: self
-      path: MSRSec
     - checkout: optee_os
-    - checkout: imx-iotcore
 
     - script: |
         wget https://releases.linaro.org/components/toolchain/binaries/6.4-2017.11/arm-linux-gnueabihf/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz
