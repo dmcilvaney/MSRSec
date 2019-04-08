@@ -1,0 +1,52 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  vmImage: 'Ubuntu-16.04'
+
+jobs:
+  - job: Build
+    resources:
+      repositories:
+      - repository: optee_os
+        type: github
+        name: ms-iot/optee_os
+      - repository: imx-iotcore
+        type: github
+        name: ms-iot/imx-iotcore
+
+    strategy:
+      matrix:
+        TpmWolf:
+          Target: ftpm
+          Crypto: CFG_FTPM_USE_WOLF=y
+        TpmOSSL:
+          Target: ftpm
+          Crypto: CFG_FTPM_USE_WOLF=n
+        AuthvarsWolf:
+          Target: authvars
+          Crypto: CFG_FTPM_USE_WOLF=y
+        AuthvarsOSSL:
+          Target: authvars
+          Crypto: CFG_FTPM_USE_WOLF=n
+
+    steps:
+    - checkout: self
+      path: MSRSec
+    - checkout: optee_os
+    - checkout: imx-iotcore
+
+    - script: |
+        wget https://releases.linaro.org/components/toolchain/binaries/6.4-2017.11/arm-linux-gnueabihf/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz
+        tar xf gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz
+    - script: |
+        cd optee_os
+        CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- make PLATFORM=imx-mx6qhmbedge CFG_TEE_CORE_LOG_LEVEL=4 CFG_REE_FS=n CFG_RPMB_FS=y CFG_RPMB_TESTKEY=y CFG_RPMB_WRITE_KEY=y -j20
+    - script: |
+        cd MSRSec/optee_ta
+        make $(Target) $(Crypto) TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
