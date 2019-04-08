@@ -11,6 +11,7 @@ resources:
   - repository: optee_os
     type: github
     name: ms-iot/optee_os
+    endpoint: Test
 
 jobs:
   - job: Build
