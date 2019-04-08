@@ -46,4 +46,4 @@ jobs:
     - script: |
         ls
         cd MSRsec/TAs/optee_ta
-        make $(Target) $(Crypto) TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
+        make $(Target) $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
