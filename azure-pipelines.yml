@@ -11,6 +11,7 @@ jobs:
     pool:
       vmImage: 'Ubuntu-16.04'
     strategy:
+      maxParallel: 4
       matrix:
         TpmWolf:
           Target: ftpm
@@ -41,5 +42,5 @@ jobs:
         CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- make PLATFORM=imx-mx6qhmbedge CFG_TEE_CORE_LOG_LEVEL=4 CFG_REE_FS=n CFG_RPMB_FS=y CFG_RPMB_TESTKEY=y CFG_RPMB_WRITE_KEY=y -j20
 
     - script: |
-        cd MSRSec/optee_ta
+        cd MSRSec/TAs/optee_ta
         make $(Target) $(Crypto) TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
