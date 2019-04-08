@@ -14,17 +14,17 @@ jobs:
       maxParallel: 4
       matrix:
         TpmWolf:
-          Target: ftpm
+          Target: fTPM
           Crypto: CFG_FTPM_USE_WOLF=y
         TpmOSSL:
-          Target: ftpm
+          Target: fTPM
           Crypto: CFG_FTPM_USE_WOLF=n
         AuthvarsWolf:
-          Target: authvars
-          Crypto: CFG_FTPM_USE_WOLF=y
+          Target: AuthVars
+          Crypto: CFG_AUTHVARS_USE_WOLF=y
         AuthvarsOSSL:
-          Target: authvars
-          Crypto: CFG_FTPM_USE_WOLF=n
+          Target: AuthVars
+          Crypto: CFG_AUTHVARS_USE_WOLF=n
 
     steps:
     - checkout: none
@@ -45,5 +45,5 @@ jobs:
 
     - script: |
         ls
-        cd MSRsec/TAs/optee_ta
-        make $(Target) $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
+        cd MSRsec/TAs/optee_ta/$(Target)
+        make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
