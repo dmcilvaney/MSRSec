@@ -27,12 +27,8 @@ jobs:
           Crypto: CFG_AUTHVARS_USE_WOLF=n
 
     steps:
-    - checkout: none
-
     - script: |
-        git clone https://github.com/microsoft/MSRsec.git
-
-    - script: |
+        cd ..
         git clone https://github.com/ms-iot/optee_os.git
 
     - script: |
@@ -40,10 +36,10 @@ jobs:
         tar xf gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf.tar.xz
     
     - script: |
-        cd optee_os
+        cd ../optee_os
         CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- make PLATFORM=imx-mx6qhmbedge CFG_TEE_CORE_LOG_LEVEL=4 CFG_REE_FS=n CFG_RPMB_FS=y CFG_RPMB_TESTKEY=y CFG_RPMB_WRITE_KEY=y CPPFLAGS="-fshort-wchar"
 
     - script: |
         ls
-        cd MSRsec/TAs/optee_ta/$(Target)
-        make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/optee_os/out/arm-plat-imx/export-ta_arm32
+        cd TAs/optee_ta/$(Target)
+        make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/../optee_os/out/arm-plat-imx/export-ta_arm32
