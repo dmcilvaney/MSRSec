@@ -5,6 +5,7 @@ jobs:
   - job: ComponentGovernance
     steps:
     - task: ComponentGovernanceComponentDetection@0
+      inputs:
 
   - job: Build
     pool:
