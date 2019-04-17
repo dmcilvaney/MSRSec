@@ -2,6 +2,10 @@ trigger:
 - master
 
 jobs:
+  - job: ComponentGovernance
+    steps:
+    - task: ComponentGovernanceComponentDetection@0
+
   - job: Build
     pool:
       vmImage: 'Ubuntu-16.04'
