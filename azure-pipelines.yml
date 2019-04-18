@@ -5,7 +5,7 @@ jobs:
   - job: ComponentGovernance
     steps:
     - script: |
-        git submodule init
+        git submodule update --init
         cd external
         python3 build_cgmanifest.py
     - task: ComponentGovernanceComponentDetection@0
