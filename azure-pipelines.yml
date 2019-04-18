@@ -6,6 +6,7 @@ jobs:
     steps:
     - script: |
         python3 external/build_cgmanifest.py
+        cat cgmanifest.json
       displayName: Generate dynamic cgmanifest.json
       
     - task: ComponentGovernanceComponentDetection@0
