@@ -4,6 +4,9 @@ trigger:
 jobs:
   - job: ComponentGovernance
     steps:
+    - script: |
+        cd external
+        python3 build_cgmanifest.py
     - task: ComponentGovernanceComponentDetection@0
 
   - job: Build
