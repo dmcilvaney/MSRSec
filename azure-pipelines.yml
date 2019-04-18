@@ -5,7 +5,7 @@ jobs:
   - job: ComponentGovernance
     steps:
     - script: |
-        python3 external/build_cgmanifest.py
+        python3 external/build_cgmanifest.py external/cgmanifest_template.json
         cat cgmanifest.json
       displayName: Generate dynamic cgmanifest.json
       
