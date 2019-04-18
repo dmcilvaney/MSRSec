@@ -10,15 +10,19 @@ jobs:
         TpmWolf:
           Target: fTPM
           Crypto: CFG_FTPM_USE_WOLF=y
+          ArtifactName: ftpm_wolf
         TpmOSSL:
           Target: fTPM
           Crypto: CFG_FTPM_USE_WOLF=n
+          ArtifactName: ftpm_ossl
         AuthvarsWolf:
           Target: AuthVars
           Crypto: CFG_AUTHVARS_USE_WOLF=y
+          ArtifactName: authvars_wolf
         AuthvarsOSSL:
           Target: AuthVars
           Crypto: CFG_AUTHVARS_USE_WOLF=n
+          ArtifactName: authvars_ossl
 
     steps:
     - script: |
@@ -44,7 +48,7 @@ jobs:
 
     - task: PublishPipelineArtifact@0
       inputs:
-        artifactName: 'TA$(Target)'
+        artifactName: 'TA_$(ArtifactName)'
         targetPath: 'TAs/optee_ta/out/$(Target)/'
 
     - script: |
@@ -56,29 +60,26 @@ jobs:
 
   - job: Test
     pool:
-      vmImage: 'Ubuntu-16.04'
+      vmImage: 'vs2017-win2016'
     strategy:
       matrix:
         TpmWolf:
-          Target: fTPM
-          Crypto: CFG_FTPM_USE_WOLF=y
+          ArtifactName: ftpm_wolf
         TpmOSSL:
-          Target: fTPM
-          Crypto: CFG_FTPM_USE_WOLF=n
+          ArtifactName: ftpm_ossl
         AuthvarsWolf:
-          Target: AuthVars
-          Crypto: CFG_AUTHVARS_USE_WOLF=y
+          ArtifactName: authvars_wolf
         AuthvarsOSSL:
-          Target: AuthVars
-          Crypto: CFG_AUTHVARS_USE_WOLF=n
+          ArtifactName: authvars_ossl
 
     dependsOn: Build
 
     steps:
     - task: DownloadPipelineArtifact@1
       inputs:
-        artifactName: 'TA$(Target)'
-        downloadPath: '$(System.ArtifactsDirectory)/$(Target)'
+        artifactName: 'TA_$(ArtifactName)'
+        downloadPath: '$(System.ArtifactsDirectory)/$(ArtifactName)'
 
     - script: |
-        ls $(System.ArtifactsDirectory)/$(Target) 
+        cd $(System.ArtifactsDirectory)/$(ArtifactName)
+        dir
