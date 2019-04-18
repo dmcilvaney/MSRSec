@@ -5,9 +5,8 @@ jobs:
   - job: ComponentGovernance
     steps:
     - script: |
-        git submodule update --init
-        cd external
-        python3 build_cgmanifest.py
+        python3 external/build_cgmanifest.py
+      displayName: Generate dynamic cgmanifest.json
     - task: ComponentGovernanceComponentDetection@0
 
   - job: Build

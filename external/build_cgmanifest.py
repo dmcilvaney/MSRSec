@@ -22,48 +22,43 @@ def get_submodules():
     submodules = []
     git_process = subprocess.run("git rev-parse --show-toplevel",shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
     git_process.check_returncode()
-
     repo_root = git_process.stdout.splitlines()[0]
-    print(repo_root)
+    print("Checking for submodules in ", repo_root)
 
-    # Submodules can have custom names, need to look up the names of submodules by path so we can finally get the url
+    # Submodules can have custom names, need to look up the names of submodules by path so we can look up the URL given a path
     cmd = "git config --file .gitmodules --get-regexp submodule.*path"
     git_process = subprocess.run(cmd, cwd=repo_root,shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
     git_process.check_returncode()
     submodule_config_data = git_process.stdout
-
     name_lookup = dict()
     for line in submodule_config_data.splitlines():
         config_name = line.split()[0][:-5] # Remove '.path' from end of name
         config_path = line.split()[1]
         name_lookup[config_path] = config_name
 
-    print(name_lookup)
-
+    # Parse list of active submodules to get commit hash and relative path
     git_process = subprocess.run("git submodule", cwd=repo_root,shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
     git_process.check_returncode()
-
-    # Parse list of submodules to get commit hash and relative path
     for line in git_process.stdout.splitlines():
         print (line)
         # Uninitialized repos will have a '-' infront of the hash
         hash = line.split()[0].strip('-')
         path = line.split()[1]
-        name = name_lookup[path] + ".url"
 
+        # Given the path of the repo, find the custom name of the submodule and search for the URL
+        name = name_lookup[path] + ".url"
         cmd = "git config --file .gitmodules --get-regexp " + name
-        
-        # Change cwd to each submodule, query for upstream url
         submodule_process = subprocess.run(cmd, cwd=repo_root, shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
         submodule_process.check_returncode()
-
         url = submodule_process.stdout.splitlines()[0].split()[1]
+
+        # Create tuple to be added to json
         repo = (url, hash)
         submodules.append(repo)
 
     return submodules
 
-# Replaces branch tags with the latest commit hash for that branch
+# Replaces branch tags in a repo object with the latest commit hash for that branch
 def update_git_repo(repo):
     branch = repo.pop('branch')
     arg = "ls-remote " + repo['repositoryUrl'] + " " + branch
