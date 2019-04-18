@@ -20,20 +20,44 @@ import subprocess, os, sys, json
 # Returns a list of tupples (URL, Commit hash) of registered first level submodules
 def get_submodules():
     submodules = []
-    git_process = subprocess.run(["git", "submodule"],shell=False, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
+    git_process = subprocess.run("git rev-parse --show-toplevel",shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
+    git_process.check_returncode()
+
+    repo_root = git_process.stdout.splitlines()[0]
+    print(repo_root)
+
+    # Submodules can have custom names, need to look up the names of submodules by path so we can finally get the url
+    cmd = "git config --file .gitmodules --get-regexp submodule.*path"
+    git_process = subprocess.run(cmd, cwd=repo_root,shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
+    git_process.check_returncode()
+    submodule_config_data = git_process.stdout
+
+    name_lookup = dict()
+    for line in submodule_config_data.splitlines():
+        config_name = line.split()[0][:-5] # Remove '.path' from end of name
+        config_path = line.split()[1]
+        name_lookup[config_path] = config_name
+
+    print(name_lookup)
+
+    git_process = subprocess.run("git submodule", cwd=repo_root,shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
     git_process.check_returncode()
 
     # Parse list of submodules to get commit hash and relative path
     for line in git_process.stdout.splitlines():
         print (line)
-        hash = line.split()[0]
-        path = os.path.abspath(os.path.join(os.getcwd(), line.split()[1]))
+        # Uninitialized repos will have a '-' infront of the hash
+        hash = line.split()[0].strip('-')
+        path = line.split()[1]
+        name = name_lookup[path] + ".url"
+
+        cmd = "git config --file .gitmodules --get-regexp " + name
         
         # Change cwd to each submodule, query for upstream url
-        submodule_process = subprocess.run("git config --get remote.origin.url", cwd=path, shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
+        submodule_process = subprocess.run(cmd, cwd=repo_root, shell=True, stdout=subprocess.PIPE,  universal_newlines=True, timeout=10)
         submodule_process.check_returncode()
 
-        url = submodule_process.stdout.splitlines()[0]
+        url = submodule_process.stdout.splitlines()[0].split()[1]
         repo = (url, hash)
         submodules.append(repo)
 
