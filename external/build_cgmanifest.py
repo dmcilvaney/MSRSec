@@ -25,6 +25,7 @@ def get_submodules():
 
     # Parse list of submodules to get commit hash and relative path
     for line in git_process.stdout.splitlines():
+        print (line)
         hash = line.split()[0]
         path = os.path.abspath(os.path.join(os.getcwd(), line.split()[1]))
         
