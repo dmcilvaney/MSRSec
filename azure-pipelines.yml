@@ -2,16 +2,7 @@ trigger:
 - master
 
 jobs:
-  - job: ComponentGovernance
-    steps:
-    - script: |
-        python3 external/build_cgmanifest.py external/cgmanifest_template.json
-        cat cgmanifest.json
-      displayName: Generate dynamic cgmanifest.json
-      
-    - task: ComponentGovernanceComponentDetection@0
-
-  - job: Build
+  - job:
     pool:
       vmImage: 'Ubuntu-16.04'
     strategy:
@@ -48,5 +39,46 @@ jobs:
     - script: |
         ls
         cd TAs/optee_ta/$(Target)
-        make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/../optee_os/out/arm-plat-imx/export-ta_arm32
+        make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)
       displayName: Build TA
+
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'TA$(Target)'
+        targetPath: 'TAs/optee_ta/out/$(Target)/'
+
+    - script: |
+        python3 external/build_cgmanifest.py external/cgmanifest_template.json
+        cat cgmanifest.json
+      displayName: Generate dynamic cgmanifest.json
+      
+    - task: ComponentGovernanceComponentDetection@0
+
+  - job: Test
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    strategy:
+      matrix:
+        TpmWolf:
+          Target: fTPM
+          Crypto: CFG_FTPM_USE_WOLF=y
+        TpmOSSL:
+          Target: fTPM
+          Crypto: CFG_FTPM_USE_WOLF=n
+        AuthvarsWolf:
+          Target: AuthVars
+          Crypto: CFG_AUTHVARS_USE_WOLF=y
+        AuthvarsOSSL:
+          Target: AuthVars
+          Crypto: CFG_AUTHVARS_USE_WOLF=n
+
+    dependsOn: Build
+
+    steps:
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'TA$(Target)'
+        downloadPath: '$(System.ArtifactsDirectory)/$(Target)'
+
+    - script: |
+        ls $(System.ArtifactsDirectory)/$(Target) 
