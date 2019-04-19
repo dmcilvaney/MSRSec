@@ -46,10 +46,18 @@ jobs:
         make $(Crypto) TA_CPU=cortex-a9 TA_CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- CROSS_COMPILE=$(Build.SourcesDirectory)/gcc-linaro-6.4.1-2017.11-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf- TA_DEV_KIT_DIR=$(Build.SourcesDirectory)/../optee_os/out/arm-plat-imx/export-ta_arm32
       displayName: Build TA
 
+    - task: CopyFiles@2
+      inputs:
+        Contents: |
+          TAs/optee_ta/out/$(Target)/*.ta
+          TAs/optee_ta/out/$(Target)/*.elf
+        targetFolder: $(Build.ArtifactStagingDirectory)/$(ArtifactName)
+
+
     - task: PublishPipelineArtifact@0
       inputs:
-        artifactName: 'TA_$(ArtifactName)'
-        targetPath: 'TAs/optee_ta/out/$(Target)/'
+        artifactName: 'TA_Binaries'
+        targetPath: $(Build.ArtifactStagingDirectory)
 
     - script: |
         python3 external/build_cgmanifest.py external/cgmanifest_template.json
@@ -61,25 +69,13 @@ jobs:
   - job: Test
     pool:
       vmImage: 'vs2017-win2016'
-    strategy:
-      matrix:
-        TpmWolf:
-          ArtifactName: ftpm_wolf
-        TpmOSSL:
-          ArtifactName: ftpm_ossl
-        AuthvarsWolf:
-          ArtifactName: authvars_wolf
-        AuthvarsOSSL:
-          ArtifactName: authvars_ossl
-
     dependsOn: Build
-
     steps:
     - task: DownloadPipelineArtifact@1
       inputs:
-        artifactName: 'TA_$(ArtifactName)'
-        downloadPath: '$(System.ArtifactsDirectory)/$(ArtifactName)'
+        artifactName: 'TA_Binaries'
+        downloadPath: '$(System.ArtifactsDirectory)'
 
     - script: |
-        cd $(System.ArtifactsDirectory)/$(ArtifactName)
+        cd $(System.ArtifactsDirectory)
         dir
