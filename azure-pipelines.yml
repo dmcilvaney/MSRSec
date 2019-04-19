@@ -56,7 +56,7 @@ jobs:
 
     - task: PublishPipelineArtifact@0
       inputs:
-        artifactName: 'TA_Binaries'
+        artifactName: $(ArtifactName)
         targetPath: $(Build.ArtifactStagingDirectory)
 
     - script: |
@@ -69,13 +69,45 @@ jobs:
   - job: Test
     pool:
       vmImage: 'vs2017-win2016'
+    strategy:
+      matrix:
+        TpmWolf:
+          ArtifactName: ftpm_wolf
+        TpmOSSL:
+          ArtifactName: ftpm_ossl
+        AuthvarsWolf:
+          ArtifactName: authvars_wolf
+        AuthvarsOSSL:
+          ArtifactName: authvars_ossl
     dependsOn: Build
+
     steps:
     - task: DownloadPipelineArtifact@1
       inputs:
-        artifactName: 'TA_Binaries'
-        downloadPath: '$(System.ArtifactsDirectory)'
+        artifactName: 'ftpm_wolf'
+        downloadPath: '$(Build.ArtifactStagingDirectory)'
 
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'ftpm_ossl'
+        downloadPath: '$(Build.ArtifactStagingDirectory)'
+
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'authvars_wolf'
+        downloadPath: '$(Build.ArtifactStagingDirectory)'
+
+    - task: DownloadPipelineArtifact@1
+      inputs:
+        artifactName: 'authvars_ossl'
+        downloadPath: '$(Build.ArtifactStagingDirectory)'
+    
     - script: |
-        cd $(System.ArtifactsDirectory)
+        cd $(Build.ArtifactStagingDirectory)
         dir
+
+    - task: PublishPipelineArtifact@0
+      inputs:
+        artifactName: 'TA_Binaries'
+        targetPath: $(Build.ArtifactStagingDirectory)
+
