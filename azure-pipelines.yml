@@ -69,16 +69,6 @@ jobs:
   - job: Test
     pool:
       vmImage: 'vs2017-win2016'
-    strategy:
-      matrix:
-        TpmWolf:
-          ArtifactName: ftpm_wolf
-        TpmOSSL:
-          ArtifactName: ftpm_ossl
-        AuthvarsWolf:
-          ArtifactName: authvars_wolf
-        AuthvarsOSSL:
-          ArtifactName: authvars_ossl
     dependsOn: Build
 
     steps:
