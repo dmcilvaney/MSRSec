@@ -59,15 +59,18 @@ jobs:
         sudo apt-get update
         sudo apt-get install android-tools-adb android-tools-fastboot autoconf automake bc bison build-essential cscope curl device-tree-compiler expect flex ftp-upload gdisk iasl libattr1-dev libc6:i386 libcap-dev libfdt-dev libftdi-dev libglib2.0-dev libhidapi-dev libncurses5-dev libpixman-1-dev libssl-dev libstdc++6:i386 libtool libz1:i386 make mtools netcat python-crypto python-serial python-wand unzip uuid-dev xdg-utils xterm xz-utils zlib1g-dev
         mkdir ../google_repo
-        curl https://storage.googleapis.com/git-repo-downloads/repo > ../google_repo/repo
-        chmod a+x ../google_repo/repo
+        cd ../google_repo
+        curl https://storage.googleapis.com/git-repo-downloads/repo > repo
+        chmod a+x repo
+        export PATH=$(pwd):$PATH
+        ls
       displayName: Install Tools
 
     - script: |
         cd ..
         mkdir qemu
         cd qemu
-        yes | ../google_repo/repo -u https://github.com/OP-TEE/manifest.git -m default.xml
+        yes | repo -u https://github.com/OP-TEE/manifest.git -m default.xml
         repo sync -j2 --no-clone-bundle
       displayName: Download QEMU
 
