@@ -74,7 +74,7 @@ jobs:
         echo $PATH
         ls $(pwd)/../
         ls $(pwd)/../google_repo
-        yes | repo -u https://github.com/OP-TEE/manifest.git -m default.xml
+        repo init -u https://github.com/OP-TEE/manifest.git -m default.xml
         repo sync -j2 --no-clone-bundle
       displayName: Download QEMU
 
