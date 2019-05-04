@@ -62,7 +62,6 @@ jobs:
         cd ../google_repo
         curl https://storage.googleapis.com/git-repo-downloads/repo > repo
         chmod a+x repo
-        export PATH=$(pwd):$PATH
         ls
       displayName: Install Tools
 
@@ -70,6 +69,9 @@ jobs:
         cd ..
         mkdir qemu
         cd qemu
+        echo $PATH
+        export PATH=$(pwd)/../google_repo:$PATH
+        echo $PATH
         yes | repo -u https://github.com/OP-TEE/manifest.git -m default.xml
         repo sync -j2 --no-clone-bundle
       displayName: Download QEMU
